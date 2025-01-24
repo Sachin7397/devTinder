@@ -12,6 +12,5 @@
     "devtinder": "file:",
     "express": "^4.21.2"
   },
-  "devDependencies": {},
   "description": ""
 }
