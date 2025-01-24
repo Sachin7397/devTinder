@@ -27,7 +27,16 @@ app.use(
   }
 );
 
+app.use("/getUserData", (req, res) => {
+  // throw new Error("abcdds");
+  // res.status(500).send("Internal server error");
+});
+
 app.use("/", (req, res) => {
+  console.log("this is running");
+  // if (err) {
+  //   res.status(500).send("Internal server error");
+  // }
   res.send("Home");
 });
 
