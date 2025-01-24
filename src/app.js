@@ -1,45 +1,31 @@
 const express = require("express");
-
+const connectDB = require("./config/database");
+const User = require("./models/user");
 const app = express();
 
-app.get("/user/:id", (req, res) => {
-  //get data from server
-  console.log(req?.params);
-  res.send({ firstName: "Sachin", age: 20 });
-});
+app.post("/signup", async (req, res) => {
+  const userObj = {
+    firstName: "Sachin",
+    lastName: "Kamble",
+    emailId: "sachin@gmail.com",
+    password: "sachin@123",
+  };
 
-app.post("/user", async (req, res) => {
-  res.send("Data save successfully");
-});
-
-app.delete("/user", (req, res) => {
-  res.send("Data deleted successfully");
-});
-
-app.use(
-  "/test",
-  (req, res, next) => {
-    // res.send("Hello from server1");
-    next();
-  },
-  (req, res) => {
-    res.send("Hello from server2");
+  //creating new instance of user model
+  const user = new User(userObj);
+  try {
+    await user.save();
+    res.send("User added successfully ");
+  } catch (err) {
+    res.status(400).send("Error saving the use" + err.message);
   }
-);
-
-app.use("/getUserData", (req, res) => {
-  // throw new Error("abcdds");
-  // res.status(500).send("Internal server error");
 });
 
-app.use("/", (req, res) => {
-  console.log("this is running");
-  // if (err) {
-  //   res.status(500).send("Internal server error");
-  // }
-  res.send("Home");
-});
-
-app.listen(7777, () => {
-  console.log("Server is successfully running on port 7777");
-});
+connectDB()
+  .then(() => {
+    console.log("Database connection successfull");
+    app.listen(7777, () => {
+      console.log("Server is successfully running on port 7777");
+    });
+  })
+  .catch((err) => console.log("Database cannot be connected"));
