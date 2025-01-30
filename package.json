@@ -9,6 +9,7 @@
   "author": "Sachin",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "devtinder": "file:",
     "express": "^4.21.2",
     "mongoose": "^8.9.5",
