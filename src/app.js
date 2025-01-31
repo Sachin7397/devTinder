@@ -4,8 +4,12 @@ const User = require("./models/user");
 const app = express();
 const { validateSignUpData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 app.use(express.json());
+app.use(cookieParser());
+
 app.post("/signup", async (req, res) => {
   // creating new instance of user model
   try {
@@ -13,7 +17,6 @@ app.post("/signup", async (req, res) => {
     const { firstName, lastName, emailId, password } = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
-    console.log(passwordHash);
     const user = new User({
       firstName,
       lastName,
@@ -36,6 +39,8 @@ app.post("/login", async (req, res) => {
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
+      const token = await jwt.sign({ _id: user._id }, "SACHINDEV@TINDE@0910");
+      res.cookie("token", token);
       res.send("Login Successfull");
     } else {
       throw new Error("Invalid credentials");
@@ -45,8 +50,29 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+
+    const decodedMessage = await jwt.verify(token, "SACHINDEV@TINDE@0910");
+    const { _id } = decodedMessage;
+
+    const user = await User.findById({ _id: _id });
+    if (!user) {
+      throw new Error("Please login again");
+    }
+    res.send("Logged in user is " + user);
+  } catch (err) {
+    res.status(400).send("ERROR: " + err.message);
+  }
+});
+
 app.get("/user", async (req, res) => {
-  console.log(req.body.emailId);
   try {
     const user = await User.find({ emailId: req.body.emailId });
     if (user.length === 0) {
